@@ -80,3 +80,16 @@ This separation follows the principle of separation of concerns:
 This design avoids over-coupling the ML pipeline to heavy
 chemistry toolchains while keeping the full workflow transparent
 and reproducible.
+
+## Baseline Model (Frozen)
+
+The baseline model consists of a Random Forest regressor trained on RDKit-based
+molecular descriptors using a fixed feature engineering pipeline.
+
+All preprocessing steps, including missing-value imputation, feature filtering,
+and numerical stabilization, were fitted exclusively on the training set and
+applied consistently to the test set. The resulting model achieved an RMSE of
+approximately 40 K and an R² of 0.88 on held-out test data.
+
+This baseline is frozen and serves as a reference point for subsequent model
+development and comparison.
