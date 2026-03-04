@@ -10,7 +10,7 @@ This project focuses on building a clean, reproducible, end-to-end pipeline rath
 
 ## Dataset
 
-The dataset consists of polymer SMILES representations paired with experimentally measured glass transition temperatures (Tg).  
+The dataset consists of polymer SMILES representations paired with experimentally measured glass transition temperatures (Tg) **in Celsius**.  
 Data were collected from publicly available polymer property datasets and literature sources.
 
 Before modeling, the dataset is cleaned to remove invalid SMILES entries, missing Tg values, and duplicate records.
@@ -93,3 +93,17 @@ approximately 40 K and an R² of 0.88 on held-out test data.
 
 This baseline is frozen and serves as a reference point for subsequent model
 development and comparison.
+
+## Model Input / Output Specification
+### Input
+- Type: str
+- Description: Valid polymer repeat-unit SMILES string
+- Example: "CC(=O)OCC"
+### Output
+- Type: float
+- Unit: Celsius
+- Description: Predicted glass transition temperature (Tg)
+- Example: 100
+### Error Handling
+- Invalid SMILES → raise ValueError
+- Missing descriptors → handled by imputation in pipeline
