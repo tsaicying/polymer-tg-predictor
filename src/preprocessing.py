@@ -92,9 +92,9 @@ def clip_array(X, clip_value=1e6):
 # -------------------------------------------------------
 
 def calc_rdkit_descriptors(smiles: str) -> dict:
-    """計算所有 RDKit 標準 descriptors，回傳 {name: value} dict。"""
+    """Calculate descriptors and return {name: value} dict。"""
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
-        return {name: None for name in ALL_RDKIT_DESCRIPTOR_NAMES}
+        raise ValueError("Invalid SMILES string")
     values = _calculator.CalcDescriptors(mol)
     return dict(zip(ALL_RDKIT_DESCRIPTOR_NAMES, values))
