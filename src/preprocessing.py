@@ -3,14 +3,11 @@ from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors, Descriptors
 from rdkit.ML.Descriptors import MoleculeDescriptors
 
-# -------------------------------------------------------
-# 所有 RDKit 標準 descriptor 的名稱清單
-# -------------------------------------------------------
+
 # ALL_RDKIT_DESCRIPTOR_NAMES = [name for name, _ in Descriptors.descList]
 
 ALL_RDKIT_DESCRIPTOR_NAMES = [desc_name[0] for desc_name in Descriptors._descList]
 
-# 用完整的 RDKit descriptor 清單初始化 calculator
 _calculator = MoleculeDescriptors.MolecularDescriptorCalculator(ALL_RDKIT_DESCRIPTOR_NAMES)
 
 
@@ -76,7 +73,7 @@ def flexibility_features(smiles):
 
 
 def polymer_aware_features(smiles):
-    """計算所有 polymer-aware features，回傳 dict。"""
+    """Calculate polymer-aware features，return dict。"""
     features = {}
     for func in [atom_fraction_features, rigidity_features, flexibility_features]:
         out = func(smiles)
@@ -88,7 +85,7 @@ def clip_array(X, clip_value=1e6):
     return np.clip(X, -clip_value, clip_value)
 
 # -------------------------------------------------------
-# RDKit descriptor 計算
+# RDKit descriptor calculation
 # -------------------------------------------------------
 
 def calc_rdkit_descriptors(smiles: str) -> dict:

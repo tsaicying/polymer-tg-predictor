@@ -14,7 +14,6 @@ model = bundle["model"]
 expected_cols = bundle["feature_columns"]
 model_version = bundle.get("model_version", "unknown")
 
-model.named_steps["rf"].set_params(n_jobs=1)
 
 def compute_features(smiles):
     feature_dict = {}
