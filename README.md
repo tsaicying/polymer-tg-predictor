@@ -44,17 +44,13 @@ can be integrated to build practical scientific prediction tools.
 
 Architecture:
 
-User
- ↓
-Frontend (HTML)
- ↓
-FastAPI
- ↓
-Prediction module
- ↓
-Feature engineering
- ↓
-Random Forest model
+graph TD
+    User[User / Researcher] --> Frontend[Web Interface]
+    Frontend --> API[FastAPI Service]
+    API --> Logic[Prediction Engine]
+    Logic --> FE[Feature Engineering: RDKit + Polymer-aware]
+    FE --> Model[Random Forest / GB Model]
+    Model --> Result[Predicted Tg in °C]
 
 The model receives a polymer SMILES string and returns the predicted Tg.
 
@@ -165,3 +161,23 @@ uvicorn
 | Gradient Boosting | RDKit descriptors | 43.70 | 0.85 |
 | RF + Polymer features | RDKit descriptors + polymer-aware | 40.4 | 0.87 |
 | Gradient Boosting + Polymer Features | RDKit descriptors + polymer-aware | 42.88 | 0.86 |
+
+### 📊 Result Analysis & Discussion
+
+In our experiments, the **Baseline RF** (using only RDKit descriptors) slightly outperformed the model with additional **Polymer-aware features**. This counter-intuitive result provides several insights:
+
+1. **Feature Redundancy**: Many RDKit molecular descriptors already capture structural information (like branching, molecular weight, and functional groups) that overlaps with custom polymer features.
+2. **Curse of Dimensionality**: Adding more features to a relatively small dataset can introduce noise, leading the Random Forest model to overfit on less significant variables.
+3. **Information Density**: The RDKit descriptors were filtered based on variance and correlation during EDA, resulting in a more "information-dense" feature set compared to the expanded set.
+
+### 🏗️ System Architecture
+
+```mermaid
+graph LR
+    A[SMILES String] --> B[Feature Engineering]
+    B --> C{Model Selection}
+    C -->|RDKit Only| D[Baseline RF]
+    C -->|Polymer-Aware| E[Advanced Model]
+    D --> F[Tg Prediction °C]
+    E --> F
+    F --> G[FastAPI Response]
