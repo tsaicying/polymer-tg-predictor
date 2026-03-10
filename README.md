@@ -44,14 +44,17 @@ can be integrated to build practical scientific prediction tools.
 
 Architecture:
 
-graph TD
-    User[User / Researcher] --> Frontend[Web Interface]
-    Frontend --> API[FastAPI Service]
-    API --> Logic[Prediction Engine]
-    Logic --> FE[Feature Engineering: RDKit + Polymer-aware]
-    FE --> Model[Random Forest / GB Model]
-    Model --> Result[Predicted Tg in °C]
+## System Architecture
 
+```mermaid
+graph LR
+    A[SMILES String] --> B[Feature Engineering]
+    B --> C{Model Selection}
+    C -->|RDKit Only| D[Baseline RF]
+    C -->|Polymer-Aware| E[Advanced Model]
+    D --> F[Tg Prediction °C]
+    E --> F
+    F --> G[FastAPI Response]
 The model receives a polymer SMILES string and returns the predicted Tg.
 
 Example API response:
@@ -60,6 +63,8 @@ Example API response:
  "predicted_tg": 81.2,
  "model_version": "v1.0.0"
 }
+
+```
 
 ## Dataset
 
@@ -162,7 +167,7 @@ uvicorn
 | RF + Polymer features | RDKit descriptors + polymer-aware | 40.4 | 0.87 |
 | Gradient Boosting + Polymer Features | RDKit descriptors + polymer-aware | 42.88 | 0.86 |
 
-### 📊 Result Analysis & Discussion
+## Result Analysis & Discussion
 
 In our experiments, the **Baseline RF** (using only RDKit descriptors) slightly outperformed the model with additional **Polymer-aware features**. This counter-intuitive result provides several insights:
 
@@ -170,14 +175,3 @@ In our experiments, the **Baseline RF** (using only RDKit descriptors) slightly 
 2. **Curse of Dimensionality**: Adding more features to a relatively small dataset can introduce noise, leading the Random Forest model to overfit on less significant variables.
 3. **Information Density**: The RDKit descriptors were filtered based on variance and correlation during EDA, resulting in a more "information-dense" feature set compared to the expanded set.
 
-### 🏗️ System Architecture
-
-```mermaid
-graph LR
-    A[SMILES String] --> B[Feature Engineering]
-    B --> C{Model Selection}
-    C -->|RDKit Only| D[Baseline RF]
-    C -->|Polymer-Aware| E[Advanced Model]
-    D --> F[Tg Prediction °C]
-    E --> F
-    F --> G[FastAPI Response]
