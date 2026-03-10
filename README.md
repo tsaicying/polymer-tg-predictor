@@ -55,6 +55,9 @@ graph LR
     D --> F[Tg Prediction °C]
     E --> F
     F --> G[FastAPI Response]
+
+```
+
 The model receives a polymer SMILES string and returns the predicted Tg.
 
 Example API response:
@@ -64,7 +67,7 @@ Example API response:
  "model_version": "v1.0.0"
 }
 
-```
+
 
 ## Dataset
 
