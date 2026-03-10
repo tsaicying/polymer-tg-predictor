@@ -25,7 +25,7 @@ requires screening large chemical spaces
 This project builds a machine learning model that predicts Tg directly 
 from polymer repeat-unit SMILES.
 
-##　Why This Project
+## Why This Project
 
 This project combines:
 
@@ -160,7 +160,7 @@ uvicorn
 ## Model Performance Comparison
 
 | Model | Features | RMSE (°C) | R² |
-|------|------|------|------|------|
+|------|------|------|------|
 | Baseline RF | RDKit descriptors | 39.92 | 0.88 |
 | Gradient Boosting | RDKit descriptors | 43.70 | 0.85 |
 | RF + Polymer features | RDKit descriptors + polymer-aware | 40.4 | 0.87 |
