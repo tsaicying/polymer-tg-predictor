@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polymer Tg Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+    <div class="flex flex-col items-center">
+        <div class="bg-white p-8 rounded-xl shadow-lg max-w-lg border border-blue-100">
+            <h1 class="text-3xl font-bold text-blue-800 mb-2 flex items-center">
+                Polymer Tg Prediction Tool
+            </h1>
+            <p class="text-gray-500 text-xl mb-6">Enter polymer SMILES string to get glass transition temperature</p>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-2xl font-bold mb-2">SMILES String</label>
+                <input type="text" id="smiles" 
+                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xl"
+                    placeholder="Example: [*C*] for polyethylene">
+            </div>
+
+            <button onclick="getPrediction()" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 text-xl">
+                Start Prediction
+            </button>
+
+            <div id="result-container" class="hidden mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p class="text-blue-800 text-2xl">Prediction Result：</p>
+                <div id="result" class="text-3xl font-mono font-bold text-blue-900 mt-1 text-center">
+                    -- °C
+                </div>
+            </div>
+
+            <div id="loading" class="hidden mt-4 text-center text-gray-400 animate-pulse">
+                Calculating...
+        </div>
+        </div>
+            <div class="mt-10 text-center text-gray-500 text-sm">
+            <p>© <span id="year"></span> designed by Chia-Ying Tsai</p>
+            <p class="mt-1">Built with FastAPI · RDKit · Machine Learning</p>
+            <p class="mt-2">
+                <a href="https://github.com/tsaicying/polymer-tg-predictor"
+                class="text-blue-600 hover:underline"
+                target="_blank">
+                View Source on GitHub
+                </a>
+            </p>
+        </div>
+    </div>
+
+
+
+    <script>
+        async function getPrediction() {
+            const smiles = document.getElementById('smiles').value;
+            const resultDiv = document.getElementById('result');
+            const resultContainer = document.getElementById('result-container');
+            const loading = document.getElementById('loading');
+
+            if (!smiles) return alert('Please enter a SMILES string!');
+
+            loading.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ smiles: smiles })
+                });
+                const data = await response.json();
+                
+                resultDiv.innerText = `${data.predicted_tg.toFixed(2)} °C`;
+                resultContainer.classList.remove('hidden');
+            } catch (error) {
+                alert('Prediction failed, please check the API connection');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+    </script>
+
+
+    <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>

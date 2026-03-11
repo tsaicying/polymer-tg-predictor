@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket
+from fastapi.responses import FileResponse
 from schemas import PredictRequest, PredictResponse
 from pathlib import Path
 import sys
@@ -9,6 +10,11 @@ sys.path.append(str(PROJECT_ROOT))
 from src.predict import predict_tg, model_version
 
 app = FastAPI(title="Polymer Tg Predictor API", version="1.0")
+
+
+@app.get("/")
+async def read_root():
+    return FileResponse("../frontend/index.html")
 
 @app.post("/predict", response_model=PredictResponse)
 def predict(request: PredictRequest) -> PredictResponse:
