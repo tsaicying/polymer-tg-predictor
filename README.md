@@ -139,14 +139,24 @@ POST /predict
 }
 
 ##　Running the Project
+- Clone the repository
 
-- Install dependencies
+```
+git clone https://github.com/tsaicying/polymer-tg-predictor.git
+cd polymer-tg-predictor
+```
+
+- Create the virtual environment
 
 Recommended environment: Python 3.10
 
 ```
-conda create -n polymer-ml python=3.10
-conda activate polymer-ml
+python -m venv .venv
+
+```
+Activate the environment.
+```
+.venv\Scripts\activate
 ```
 
 Install packages:
@@ -160,6 +170,16 @@ scikit-learn
 pandas
 FastAPI
 uvicorn
+
+- Running the API server
+
+```
+uvicorn api.main:app --reload
+```
+If the server starts successfully, you should see output similar to:
+```
+Uvicorn running on http://127.0.0.1:8000
+```
 
 ## Model Performance Comparison
 
