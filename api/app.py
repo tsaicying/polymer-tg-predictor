@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, WebSocket
 from fastapi.responses import FileResponse
-from schemas import PredictRequest, PredictResponse
+from api.schemas import PredictRequest, PredictResponse
 from pathlib import Path
 import sys
 from fastapi.middleware.cors import CORSMiddleware
