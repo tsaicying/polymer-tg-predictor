@@ -3,6 +3,7 @@ from fastapi.responses import FileResponse
 from schemas import PredictRequest, PredictResponse
 from pathlib import Path
 import sys
+from fastapi.middleware.cors import CORSMiddleware
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.append(str(PROJECT_ROOT))
@@ -12,9 +13,16 @@ from src.predict import predict_tg, model_version
 app = FastAPI(title="Polymer Tg Predictor API", version="1.0")
 
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 部署後可以改成你的 frontend URL
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 async def read_root():
-    return FileResponse("../frontend/index.html")
+    return FileResponse(PROJECT_ROOT / "frontend" / "index.html")
 
 @app.post("/predict", response_model=PredictResponse)
 def predict(request: PredictRequest) -> PredictResponse:

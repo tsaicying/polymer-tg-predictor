@@ -1,91 +1,320 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polymer Tg Predictor</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Polymer Tg Predictor</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f3;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 2.5rem 1rem;
+    }
+
+    .header { margin-bottom: 2rem; }
+    .header h1 { font-size: 22px; font-weight: 500; }
+    .header p { font-size: 14px; color: #666; margin-top: 4px; line-height: 1.5; }
+
+    .card {
+      background: #fff;
+      border: 0.5px solid rgba(0,0,0,0.12);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 8px 12px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      border: 0.5px solid rgba(0,0,0,0.2);
+      border-radius: 8px;
+      background: #fff;
+      color: #1a1a1a;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input[type="text"]:focus { border-color: rgba(0,0,0,0.5); }
+
+    .examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .examples-label { font-size: 12px; color: #999; width: 100%; margin-bottom: 2px; }
+
+    .example-btn {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 0.5px solid rgba(0,0,0,0.2);
+      background: #f5f5f3;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .example-btn:hover { background: #eee; color: #1a1a1a; }
+
+    .predict-btn {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-top: 14px;
+      cursor: pointer;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      transition: opacity 0.15s;
+      font-family: inherit;
+    }
+    .predict-btn:hover { opacity: 0.85; }
+    .predict-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .result-card { display: none; }
+    .result-card.visible { display: block; }
+
+    .tg-display { display: flex; align-items: baseline; gap: 6px; margin-bottom: 1rem; }
+    .tg-value { font-size: 36px; font-weight: 500; }
+    .tg-unit { font-size: 16px; color: #666; }
+
+    .range-bar {
+      position: relative;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #B5D4F4 0%, #9FE1CB 40%, #FAC775 70%, #F5C4B3 100%);
+      margin: 8px 0 4px;
+    }
+    .range-marker {
+      position: absolute;
+      top: -4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      border: 2px solid #fff;
+      transform: translateX(-50%);
+      transition: left 0.5s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #999;
+    }
+
+    .category-badge {
+      display: inline-block;
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    .cat-low      { background: #E6F1FB; color: #185FA5; }
+    .cat-mid      { background: #EAF3DE; color: #3B6D11; }
+    .cat-high     { background: #FAEEDA; color: #854F0B; }
+    .cat-very-high{ background: #FAECE7; color: #993C1D; }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 1rem;
+    }
+    .meta-item {
+      background: #f5f5f3;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .meta-label { font-size: 11px; color: #999; margin-bottom: 2px; }
+    .meta-val   { font-size: 14px; font-weight: 500; }
+
+    .model-info {
+      border-top: 0.5px solid rgba(0,0,0,0.1);
+      margin-top: 1rem;
+      padding-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .model-stat { font-size: 12px; color: #888; }
+    .model-stat span { color: #1a1a1a; font-weight: 500; }
+
+    .error-msg {
+      display: none;
+      font-size: 13px;
+      color: #c0392b;
+      margin-top: 8px;
+    }
+    .error-msg.visible { display: block; }
+
+    .footer {
+      font-size: 12px;
+      color: #aaa;
+      text-align: center;
+      margin-top: 1.5rem;
+      line-height: 1.8;
+    }
+    .footer a { color: #555; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
-    <div class="flex flex-col items-center">
-        <div class="bg-white p-8 rounded-xl shadow-lg max-w-lg border border-blue-100">
-            <h1 class="text-3xl font-bold text-blue-800 mb-2 flex items-center">
-                Polymer Tg Prediction Tool
-            </h1>
-            <p class="text-gray-500 text-xl mb-6">Enter polymer SMILES string to get glass transition temperature</p>
+<body>
+  <div class="page">
 
-            <div class="mb-4">
-                <label class="block text-gray-700 text-2xl font-bold mb-2">SMILES String</label>
-                <input type="text" id="smiles" 
-                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xl"
-                    placeholder="Example: [*C*] for polyethylene">
-            </div>
-
-            <button onclick="getPrediction()" 
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 text-xl">
-                Start Prediction
-            </button>
-
-            <div id="result-container" class="hidden mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p class="text-blue-800 text-2xl">Prediction Result：</p>
-                <div id="result" class="text-3xl font-mono font-bold text-blue-900 mt-1 text-center">
-                    -- °C
-                </div>
-            </div>
-
-            <div id="loading" class="hidden mt-4 text-center text-gray-400 animate-pulse">
-                Calculating...
-        </div>
-        </div>
-            <div class="mt-10 text-center text-gray-500 text-sm">
-            <p>© <span id="year"></span> designed by Chia-Ying Tsai</p>
-            <p class="mt-1">Built with FastAPI · RDKit · Machine Learning</p>
-            <p class="mt-2">
-                <a href="https://github.com/tsaicying/polymer-tg-predictor"
-                class="text-blue-600 hover:underline"
-                target="_blank">
-                View Source on GitHub
-                </a>
-            </p>
-        </div>
+    <div class="header">
+      <h1>Polymer Tg predictor</h1>
+      <p>Enter a polymer repeat-unit SMILES string to get a predicted glass transition temperature.</p>
     </div>
 
+    <div class="card">
+      <label class="label">SMILES string</label>
+      <input type="text" id="smiles-input" placeholder="e.g. [*]CC[*] for polyethylene" />
 
+      <div class="examples">
+        <span class="examples-label">Try an example:</span>
+        <button class="example-btn" data-smiles="[*]CC[*]">Polyethylene</button>
+        <button class="example-btn" data-smiles="[*]CC([*])c1ccccc1">Polystyrene</button>
+        <button class="example-btn" data-smiles="[*]CC([*])C(=O)OC">PMMA</button>
+        <button class="example-btn" data-smiles="[*]CC([*])C#N">PAN</button>
+      </div>
 
-    <script>
-        async function getPrediction() {
-            const smiles = document.getElementById('smiles').value;
-            const resultDiv = document.getElementById('result');
-            const resultContainer = document.getElementById('result-container');
-            const loading = document.getElementById('loading');
+      <div class="error-msg" id="error-msg">Invalid SMILES string. Please check your input.</div>
+      <button class="predict-btn" id="predict-btn">Predict Tg</button>
+    </div>
 
-            if (!smiles) return alert('Please enter a SMILES string!');
+    <div class="card result-card" id="result-card">
+      <label class="label">Predicted glass transition temperature</label>
+      <div class="tg-display">
+        <span class="tg-value" id="tg-value">—</span>
+        <span class="tg-unit">°C</span>
+      </div>
 
-            loading.classList.remove('hidden');
-            resultContainer.classList.add('hidden');
+      <div class="range-bar">
+        <div class="range-marker" id="range-marker" style="left: 50%"></div>
+      </div>
+      <div class="range-labels">
+        <span>−100°C</span>
+        <span>0°C</span>
+        <span>100°C</span>
+        <span>300°C</span>
+      </div>
+      <div id="category-badge" class="category-badge cat-mid">—</div>
 
-            try {
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ smiles: smiles })
-                });
-                const data = await response.json();
-                
-                resultDiv.innerText = `${data.predicted_tg.toFixed(2)} °C`;
-                resultContainer.classList.remove('hidden');
-            } catch (error) {
-                alert('Prediction failed, please check the API connection');
-            } finally {
-                loading.classList.add('hidden');
-            }
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="meta-label">Input SMILES</div>
+          <div class="meta-val" id="result-smiles" style="font-family: monospace; font-size: 12px; word-break: break-all;">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Model version</div>
+          <div class="meta-val">v1.0.0</div>
+        </div>
+      </div>
+
+      <div class="model-info">
+        <div class="model-stat">Model: <span>Random Forest</span></div>
+        <div class="model-stat">R²: <span>0.88</span></div>
+        <div class="model-stat">CV RMSE: <span>40.8 ± 2.2°C</span></div>
+        <div class="model-stat">Training data: <span>7,000+ polymers</span></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      © 2026 designed by Chia-Ying Tsai · Built with FastAPI · RDKit · Machine Learning<br>
+      <a href="https://github.com/tsaicying/polymer-tg-predictor" target="_blank">View source on GitHub</a>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = 'http://127.0.0.1:8000/predict'; // ← 部署後改成你的實際 URL
+
+    document.querySelectorAll('.example-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('smiles-input').value = btn.dataset.smiles;
+        document.getElementById('error-msg').classList.remove('visible');
+      });
+    });
+
+    document.getElementById('predict-btn').addEventListener('click', runPrediction);
+    document.getElementById('smiles-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') runPrediction();
+    });
+
+    function getCategory(tg) {
+      if (tg < 0)   return { label: 'Low Tg polymer — flexible, rubbery at room temperature', cls: 'cat-low' };
+      if (tg < 80)  return { label: 'Mid Tg polymer — semi-rigid', cls: 'cat-mid' };
+      if (tg < 150) return { label: 'High Tg polymer — rigid, glassy at room temperature', cls: 'cat-high' };
+      return           { label: 'Very high Tg polymer — engineering plastic / heat-resistant', cls: 'cat-very-high' };
+    }
+
+    function tgToPercent(tg) {
+      const min = -100, max = 300;
+      return Math.min(100, Math.max(0, ((tg - min) / (max - min)) * 100));
+    }
+
+    async function runPrediction() {
+      const smiles = document.getElementById('smiles-input').value.trim();
+      if (!smiles) return;
+
+      const btn = document.getElementById('predict-btn');
+      btn.disabled = true;
+      btn.textContent = 'Predicting...';
+      document.getElementById('error-msg').classList.remove('visible');
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ smiles })
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.detail || 'Prediction failed');
         }
-    </script>
 
+        const data = await response.json();
+        const tg = Math.round(data.predicted_tg);
 
-    <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-    </script>
+        document.getElementById('tg-value').textContent = tg;
+        document.getElementById('result-smiles').textContent = smiles;
+        document.getElementById('range-marker').style.left = tgToPercent(tg) + '%';
+
+        const cat = getCategory(tg);
+        const badge = document.getElementById('category-badge');
+        badge.textContent = cat.label;
+        badge.className = 'category-badge ' + cat.cls;
+
+        document.getElementById('result-card').classList.add('visible');
+
+      } catch (err) {
+        document.getElementById('error-msg').textContent =
+          err.message.includes('Invalid') ? 'Invalid SMILES string. Please check your input.'
+          : 'Could not connect to prediction server. Make sure the API is running.';
+        document.getElementById('error-msg').classList.add('visible');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Predict Tg';
+      }
+    }
+  </script>
 </body>
-
 </html>
