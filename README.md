@@ -1,4 +1,4 @@
-**Live Demo**: https://polymer-tg-predictor-1.onrender.com
+**Live Demo**: https://polymer-tg-predictor.onrender.com/
 
 
 ## Polymer Tg Predictor
